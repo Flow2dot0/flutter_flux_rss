@@ -37,8 +37,6 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
 
-    Orientation orientation = MediaQuery.of(context).orientation;
-
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -64,49 +62,6 @@ class _HomeState extends State<Home> {
     }
   }
 
-  List<Widget> cardGenerator() {
-    List<Widget> l = [];
-    feed.items.forEach((item) {
-      item = item;
-      Row row = Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          CardItem((item.author!=null ? item.author : ""), item.pubDate, item.enclosure.url, item.title)
-        ],
-      );
-      l.add(row);
-    });
-    feed.items.forEach((item) {
-      item = item;
-      GridView grid = GridView.builder(
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 4),
-          itemBuilder: (context, i) {
-            return Container(
-              margin: EdgeInsets.all(2.5),
-              child: CardItem((item.author!=null ? item.author : ""), item.pubDate, item.enclosure.url, item.title),
-            );
-          }
-      );
-      l.add(grid);
-    });
-    return l;
-  }
-
-  Widget widgetsGrid() {
-    feed.items.forEach((item) {
-      item = item;
-      return GridView.builder(
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 4),
-          itemCount: dataList.length,
-          itemBuilder: (context, i) {
-            return Container(
-              margin: EdgeInsets.all(2.5),
-              child: dataList[i],
-            );
-          }
-      );
-    });
-  }
 
   Future<Null> parsing() async {
     RssFeed response = await Parser().loadRSS();
@@ -114,11 +69,6 @@ class _HomeState extends State<Home> {
     if(response!=null) {
       setState(() {
         feed = response;
-        feed.items.forEach((item) {
-          item = item;
-          CardItem card = CardItem((item.author!=null ? item.author : ""), item.pubDate, item.enclosure.url, item.title);
-          dataList.add(card);
-        });
       });
     } else {
       print("request didn't succeed");
