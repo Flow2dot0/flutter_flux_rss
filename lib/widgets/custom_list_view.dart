@@ -44,7 +44,7 @@ class _CustomListViewState extends State<CustomListView> {
     );
   }
 
-  orderingProcess() {
+  void orderingProcess() {
     feedOrderedByDate.sort((a,b) {
       var aDate = a['item.pubDate'];
       var bDate = b['item.pubDate'];
