@@ -26,7 +26,7 @@ class CardItem extends Card {
                   Card(
                     elevation: 2.00,
                     child: Container(
-                      child: (enclosureUrl!=""? Image.network(enclosureUrl, fit: BoxFit.fill,) : Image.asset("assets/img/no_image.png", width: 150.0, height: 120.00, fit: BoxFit.fill,)),
+                      child: (enclosureUrl!=""? Image.network(enclosureUrl, fit: BoxFit.fill, width: 150.0, height: 100.00,) : Image.asset("assets/img/no_image.png", width: 150.0, height: 120.00, fit: BoxFit.fill,)),
                     ),
                   ),
                   customContainer(CustomText(title, color: Colors.black, fontSize: 16.0, fontStyle: FontStyle.italic,), size: 225.00),

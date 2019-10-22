@@ -19,8 +19,7 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
 
-  RssFeed feed;
-  RssItem item;
+  AtomFeed feed;
 
   CardItem cardItem;
 
@@ -64,15 +63,25 @@ class _HomeState extends State<Home> {
 
 
   Future<Null> parsing() async {
-    RssFeed response = await Parser().loadRSS();
+    AtomFeed response = await Parser().loadRSS('theverge');
     print(response);
     if(response!=null) {
       setState(() {
         feed = response;
       });
-    } else {
-      print("request didn't succeed");
+      print("le feed ${feed.items.first.title}");
     }
+
+
+
+//    if(response!=null) {
+//      setState(() {
+//        feed = response;
+//        print(feed);
+//      });
+//    } else {
+//      print("request didn't succeed");
+//    }
   }
 
 }
