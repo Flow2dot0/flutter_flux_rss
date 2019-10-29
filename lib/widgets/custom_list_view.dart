@@ -9,10 +9,11 @@ import 'package:intl/intl.dart';
 
 class CustomListView extends StatefulWidget {
 
-  AtomFeed feed;
+  Future feed;
 
-  CustomListView(AtomFeed feed) {
+  CustomListView(Future feed) {
     this.feed = feed;
+
   }
 
   @override
@@ -30,18 +31,31 @@ class _CustomListViewState extends State<CustomListView> {
     super.initState();
     setData();
     orderingProcess();
+    print(widget.feed);
   }
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-      itemCount: fixFeedOrderedByDate.length,
-        itemBuilder: (context, i) {
-        Map each = fixFeedOrderedByDate[i];
-          return Container(
-            child: CardItem(each['item.author'], DateConvert().convertDate(each['item.pubDate']), each['item.enclosure.url'], each['item.title']),
+    return FutureBuilder<List>(
+        future: widget.feed,
+        builder: (context, snapshot) {
+          if(snapshot.connectionState != ConnectionState.done) {
+            // return: show loading widget
+          }
+          if(snapshot.hasError) {
+            // return: show error widget
+          }
+          List l = snapshot.data ?? [];
+          return ListView.builder(
+              itemCount: l.length,
+              itemBuilder: (context, i) {
+//                Map each = fixFeedOrderedByDate[i];
+//                return Container(
+//                  child: CardItem(each['item.author'], DateConvert().convertDate(each['item.pubDate']), each['item.enclosure.url'], each['item.title']),
+//                );
+              }
           );
-        }
-    );
+        });
+
   }
 
   void orderingProcess() {
