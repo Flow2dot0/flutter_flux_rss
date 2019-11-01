@@ -9,7 +9,7 @@ import 'package:intl/intl.dart';
 
 class CustomListView extends StatefulWidget {
 
-  Future<dynamic> feed;
+  List<Map> feed;
 
   CustomListView(this.feed);
 
@@ -27,32 +27,21 @@ class _CustomListViewState extends State<CustomListView> {
     // TODO: implement initState
     super.initState();
     setData();
-    orderingProcess();
     print("voici le feeed ::::::  ${widget.feed}");
   }
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<List>(
-        future: widget.feed,
-        builder: (context, snapshot) {
-          if(snapshot.connectionState != ConnectionState.done) {
-            // return: show loading widget
-          }
-          if(snapshot.hasError) {
-            // return: show error widget
-          }
-          List l = snapshot.data ?? [];
-          return ListView.builder(
-              itemCount: l.length,
-              itemBuilder: (context, i) {
-                Map each = l[i];
-                return Container(
-                  height: 10.0,
-                  child: CardItem(each['item.author'], DateConvert().convertDate(each['item.pubDate']), each['item.enclosure.url'], each['item.title']),
-                );
-              }
+    List l = widget.feed;
+    return ListView.builder(
+        itemCount: l.length,
+        itemBuilder: (context, i) {
+          Map each = l[i];
+          return Container(
+            height: 200.0,
+            child: CardItem(each['author'], "", "", each['title']),
           );
-        });
+        }
+    );
 
   }
 

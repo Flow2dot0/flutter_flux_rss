@@ -14,18 +14,64 @@ class Parser {
     'appledev' : 'https://developer.apple.com/news/releases/rss/releases.rss',
   };
 
-  Future<AtomFeed> loadRSS(String string) async {
-    var client = new http.Client();
-    await client.get(string).then((response) {
-      return response.body;
-    }).then((bodyString) {
-      var feed = new AtomFeed.parse(bodyString);
-      print(feed);
-      // ca passe mais c pas recup du coté home
-      return feed;
-    });
+  Future<List<Map>> loadRSS(List keys, List entries) async {
 
+    List<dynamic> getKeys = keys;
+    List<dynamic> getEntries = entries;
+
+    List<Map> dataFull = [];
+
+    String mode;
+    int index = -1;
+
+    var client = new http.Client();
+    for(var value in getEntries) {
+      index++;
+      final getFeed = await client.get(value['url']);
+      String url = value['url'].toString();
+      mode = url.substring(url.length-4, url.length);
+      if(getFeed.statusCode==200){
+        print(getFeed.body);
+        switch(mode) {
+          case ".xml" :
+            AtomFeed feed = AtomFeed.parse(getFeed.body);
+            feed.items.forEach((item) {
+              Map data = {
+                "title" : item.title,
+                "date" : item.updated,
+                "author" : null,
+                "poster" : null,
+              };
+              dataFull.add(data);
+            });
+            break;
+          case ".rss" :
+            RssFeed feed = RssFeed.parse(getFeed.body);
+            feed.items.forEach((item) {
+              Map data = {
+                "title" : item.title,
+                "date" : item.pubDate,
+                "author" : null,
+                "poster" : null,
+              };
+              dataFull.add(data);
+            });
+            break;
+        }
+      }
+    }
+
+    print(dataFull);
+    return dataFull;
   }
 
+  ordering(List<Map> dataFull, {String sortType = "date"}) async{
+    var tmp = dataFull.sort((a, b) {
+      var aType = a['$sortType'];
+      var bType = b[('$sortType')];
+      return aType.compareTo(bType);
+    });
+    return tmp;
+  }
 
 }

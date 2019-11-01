@@ -17,15 +17,14 @@ class Database{
 
   Map toJson() => userDefault;
 
-  Database(){
-    initDb();
-  }
+  Database();
 
   @override
   String toString() => toJson().toString();
 
-  initDb() async{
-    await Barbarian.init().then((response) {
+  Future<bool> initDb() async{
+    var response = await Barbarian.init();
+    if(response!=null) {
       if(userDefault==null) {
         var get = Barbarian.read("user_default",
             customDecode: (output) => output.map((k, v) => MapEntry(k, v)));
@@ -33,26 +32,21 @@ class Database{
         if(get==null) {
           Barbarian.write("user_default", userDefaultLocked);
           print("...CREATE DATABASE...");
+
         }else{
           userDefault = get;
           print(userDefault);
           print("jattribue la base trouvée à $userDefault");
           print("...LOADING DATABASE...");
         }
+        return true;
       }
-      return userDefault;
-    });
-
+      return false;
+    }
   }
 
-  getList() {
-    var get = userDefault['manager_flux'];
-    print('Jaffiche une liste ${userDefault['manager_flux']}');
-    print(userDefault);
-    return get;
-  }
 
-  add(String title, String url){
+  void add(String title, String url){
     var counter = url.length;
     var sc = url.substring(counter-4, counter);
 
@@ -63,55 +57,42 @@ class Database{
       "date" : DateTime.now().toString(),
     };
     syncData();
-    return userDefault;
   }
 
-  update(String title, String url) {
+  void update(String title, String url) {
     delete(title);
     add(title, url);
   }
 
-  delete(String name) {
+  void delete(String name) {
     userDefault['manager_flux'].remove(name);
     print(userDefault);
     syncData();
-    return userDefault;
   }
 
-  reset() {
+  void reset() {
     userDefault = userDefaultLocked;
     syncData();
-    return userDefault;
   }
 
-  getActualKeys(){
+  List<dynamic> getActualKeys(){
     List l = [];
-    userDefault['manager_flux'].forEach((k, v) {
-      print(k);
-      l.add(k);
-    });
-//    for(var key in userDefault['manager_flux'].keys) {
-//      l.add(key);
-//    }
+    for(var key in userDefault['manager_flux'].keys) {
+      l.add(key);
+    }
     print(l);
     return l;
   }
 
-  getActualEntries(){
+  List<dynamic> getActualEntries(){
     List l = [];
-    userDefault['manager_flux'].forEach((k, v) {
-      print(v);
-      l.add(v);
-    });
-//    for(var value in userDefault['manager_flux'].values) {
-//      l.add(value);
-//    }
+    for(var value in userDefault['manager_flux'].values) {
+      l.add(value);
+    }
     return l;
   }
 
-
-
-  Future syncData() async{
+  Future<bool> syncData() async{
     await Barbarian.init();
     Barbarian.delete("user_default");
     Barbarian.write("user_default", userDefault);
@@ -119,13 +100,12 @@ class Database{
         customDecode: (output) => output.map((k, v) => MapEntry(k, v)));
     print(get);
     if(get!=null){
-      print("...SUCCESS : SYNC DONE...");
-      return "success";
+      print("SYNCING : SUCCESS");
+      return true;
     } else {
-      print("...ERROR : SYNC FAILED...");
-      return "failed";
+      print("SYNCING : FAILED");
+      return true;
     }
-
   }
 
 

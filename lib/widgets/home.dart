@@ -48,9 +48,14 @@ class _HomeState extends State<Home> {
 
   List getListOfFeeds;
 
+
+
   var db;
-  var listKeys;
-  var listEntries;
+  List<dynamic> listKeys;
+  List<dynamic> listEntries;
+  List<Map> parsedData;
+
+
   var editingName;
   var editingUrl;
 
@@ -64,7 +69,6 @@ class _HomeState extends State<Home> {
     // TODO: implement initState
     super.initState();
     dbConnect();
-    parsing();
   }
 
   @override
@@ -102,176 +106,178 @@ class _HomeState extends State<Home> {
       Orientation orientation = MediaQuery.of(context).orientation;
       if(orientation==Orientation.portrait){
         // list
-        return Center(
-            child: Column(
-              children: <Widget>[
-                Padding(padding: EdgeInsets.all(10.0)),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: <Widget>[
-                    headerButton("ADD", Colors.lightGreen ,() {
-                      return showDialog(
-                          context: context,
-                        builder: (BuildContext context) {
-                            return SimpleDialog(
-                              elevation: 10.0,
-                              title: CustomText("New".toUpperCase(), color: Colors.green,),
-                              children: <Widget>[
-                                Divider(),
-                                Container(
-                                  padding: EdgeInsets.all(40.0),
-                                  child: Column(
-                                    children: <Widget>[
-                                      TextField(
+        return Container(
+          color: Colors.indigo[50],
+          child: Center(
+              child: Column(
+                children: <Widget>[
+                  Padding(padding: EdgeInsets.all(10.0)),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: <Widget>[
+                      headerButton("ADD", Colors.lightGreen ,() {
+                        return showDialog(
+                            context: context,
+                          builder: (BuildContext context) {
+                              return SimpleDialog(
+                                elevation: 10.0,
+                                title: CustomText("New".toUpperCase(), color: Colors.green,),
+                                children: <Widget>[
+                                  Divider(),
+                                  Container(
+                                    padding: EdgeInsets.all(40.0),
+                                    child: Column(
+                                      children: <Widget>[
+                                        TextField(
 
-                                        obscureText: false,
-                                        decoration: InputDecoration(
-                                          border: OutlineInputBorder(),
-                                          labelText: "Name",
-                                          hintText: "Enter a name",
+                                          obscureText: false,
+                                          decoration: InputDecoration(
+                                            border: OutlineInputBorder(),
+                                            labelText: "Name",
+                                            hintText: "Enter a name",
+                                          ),
+                                          onChanged: (String s) {
+                                            editingName = s;
+                                          },
                                         ),
-                                        onChanged: (String s) {
-                                          editingName = s;
-                                          print(editingName);
-                                        },
-                                      ),
-                                      Padding(padding: EdgeInsets.all(10.0)),
-                                      TextField(
-                                        obscureText: false,
-                                        decoration: InputDecoration(
-                                          border: OutlineInputBorder(),
-                                          labelText: 'URL',
-                                          hintText: "Enter an URL",
+                                        Padding(padding: EdgeInsets.all(10.0)),
+                                        TextField(
+                                          obscureText: false,
+                                          decoration: InputDecoration(
+                                            border: OutlineInputBorder(),
+                                            labelText: 'URL',
+                                            hintText: "Enter an URL",
+                                          ),
+                                          onChanged: (String s) {
+                                            editingUrl = s;
+                                          },
                                         ),
-                                        onChanged: (String s) {
-                                          editingUrl = s;
-                                          print(editingUrl);
-                                        },
-                                      ),
-                                    ],
+                                      ],
+                                    ),
                                   ),
-                                ),
-                                Divider(),
-                                Padding(padding: EdgeInsets.all(3.0)),
-                                SimpleDialogOption(
-                                  onPressed: () {
-                                    setState(() {
-                                      db.add((editingName!=null? editingName : null), (editingUrl!=null?editingUrl : null));
-                                      dbConnect();
-                                      Navigator.pop(context);
-                                    });
-                                  },
-                                  child: CustomText("Add", color: Colors.indigo,),
-                                ),
-                              ],
-                            );
-                        }
-                      );
-                    }, width: 145.0,),
-                    headerButton("RESET", Colors.grey ,() {
-                      db.reset();
-                      setState(() {
-                        dbConnect();
-                      });
-                    }, width: 145.0),
-                  ],
-                ),
-                Container(
-                  height: 200.00,
-                  padding: EdgeInsets.all(20.0),
-                  child: ListView.separated(
-                    padding: const EdgeInsets.all(8),
-                    itemCount: listKeys.length,
-                    itemBuilder: (BuildContext context, int index) {
-                      return InkWell(
-                        onLongPress: () {
-                          Future.sync(() => {
-                            showDialog(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return SimpleDialog(
-                                    elevation: 10.0,
-                                    title: CustomText("Information".toUpperCase(), color: Colors.black,),
-                                    children: <Widget>[
-                                      Divider(),
-                                      Container(
-                                        padding: EdgeInsets.all(40.0),
-                                        child: Column(
-                                          children: <Widget>[
-                                            TextField(
-                                              obscureText: true,
-                                              decoration: InputDecoration(
-                                                border: OutlineInputBorder(),
-                                                labelText: "Name",
-                                                hintText: listKeys[index],
-                                              ),
-                                              onChanged: (String s) {
-                                                editingName = s;
-                                                print(editingName);
-                                              },
-                                            ),
-                                            Padding(padding: EdgeInsets.all(10.0)),
-                                            TextField(
-                                              obscureText: true,
-                                              decoration: InputDecoration(
-                                                border: OutlineInputBorder(),
-                                                labelText: 'URL',
-                                                hintText: listEntries[index]['url'],
-                                              ),
-                                              onChanged: (String s) {
-                                                editingUrl = s;
-                                                print(editingUrl);
-                                              },
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                      RaisedButton(
-                                        color : Colors.indigo,
-                                        onPressed: () {
-                                          setState(() {
-                                            db.delete(listKeys[index]);
-                                            db.add((editingName!=null? editingName : listKeys[index]), (editingUrl!=null?editingUrl : listEntries[index]['url']));
-                                            dbConnect();
-                                            Navigator.pop(context);
-                                          });
-                                        },
-                                        child: Container(
-                                            padding : EdgeInsets.all(15.00),
-                                            child: CustomText("Ok", color: Colors.white,)),
-                                      ),
-                                      Padding(padding: EdgeInsets.all(5.0)),
-                                      SimpleDialogOption(
-                                        onPressed: () {
-                                          setState(() {
-                                            db.delete(listKeys[index]);
-                                            dbConnect();
-                                            Navigator.pop(context);
-                                          });
-                                        },
-                                        child: CustomText("Delete", color: Colors.red,),
-                                      ),
-                                    ],
-                                  );
-                                }
-                            )
-                          });
-                        },
-                        child:  Container(
-                            height: 30,
-                            child: Center(child: CustomText('${listKeys[index].toString().toUpperCase()}', color: Colors.indigo, fontStyle: FontStyle.italic, fontSize: 15.0,))
-                        ),
-                      );
-                    },
-                    separatorBuilder: (BuildContext context, int index) => const Divider(),
+                                  Divider(),
+                                  Padding(padding: EdgeInsets.all(3.0)),
+                                  SimpleDialogOption(
+                                    onPressed: () {
+                                      setState(() {
+                                        db.add((editingName!=null? editingName : null), (editingUrl!=null?editingUrl : null));
+                                        dbConnect();
+                                        Navigator.pop(context);
+                                      });
+                                    },
+                                    child: CustomText("Add", color: Colors.indigo,),
+                                  ),
+                                ],
+                              );
+                          }
+                        );
+                      }, width: 145.0,),
+                      headerButton("RESET", Colors.grey ,() {
+                        db.reset();
+                        setState(() {
+                          dbConnect();
+                        });
+                      }, width: 145.0),
+                    ],
                   ),
-                ),
-//                SizedBox(
-//                  height: MediaQuery.of(context).size.height*0.59,
-//                  child: (feed!=null? CustomListView(feed) : CustomText("en cours")),
-//                )
-              ],
-            ),
+                  Container(
+                    height: 125.00,
+                    padding: EdgeInsets.all(22.0),
+                    child: ListView.separated(
+                      padding: const EdgeInsets.all(8),
+                      itemCount: listKeys.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        return InkWell(
+                          onLongPress: () {
+                            Future.sync(() => {
+                              showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return SimpleDialog(
+                                      elevation: 10.0,
+                                      title: CustomText("Information".toUpperCase(), color: Colors.black,),
+                                      children: <Widget>[
+                                        Divider(),
+                                        Container(
+                                          padding: EdgeInsets.all(40.0),
+                                          child: Column(
+                                            children: <Widget>[
+                                              TextField(
+                                                obscureText: true,
+                                                decoration: InputDecoration(
+                                                  border: OutlineInputBorder(),
+                                                  labelText: "Name",
+                                                  hintText: listKeys[index],
+                                                ),
+                                                onChanged: (String s) {
+                                                  editingName = s;
+                                                  print(editingName);
+                                                },
+                                              ),
+                                              Padding(padding: EdgeInsets.all(10.0)),
+                                              TextField(
+                                                obscureText: true,
+                                                decoration: InputDecoration(
+                                                  border: OutlineInputBorder(),
+                                                  labelText: 'URL',
+                                                  hintText: listEntries[index]['url'],
+                                                ),
+                                                onChanged: (String s) {
+                                                  editingUrl = s;
+                                                  print(editingUrl);
+                                                },
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        RaisedButton(
+                                          color : Colors.indigo,
+                                          onPressed: () {
+                                            setState(() {
+                                              db.delete(listKeys[index]);
+                                              db.add((editingName!=null? editingName : listKeys[index]), (editingUrl!=null?editingUrl : listEntries[index]['url']));
+                                              dbConnect();
+                                              Navigator.pop(context);
+                                            });
+                                          },
+                                          child: Container(
+                                              padding : EdgeInsets.all(15.00),
+                                              child: CustomText("Ok", color: Colors.white,)),
+                                        ),
+                                        Padding(padding: EdgeInsets.all(5.0)),
+                                        SimpleDialogOption(
+                                          onPressed: () {
+                                            setState(() {
+                                              db.delete(listKeys[index]);
+                                              dbConnect();
+                                              Navigator.pop(context);
+                                            });
+                                          },
+                                          child: CustomText("Delete", color: Colors.red,),
+                                        ),
+                                      ],
+                                    );
+                                  }
+                              )
+                            });
+                          },
+                          child:  Container(
+                            color: Colors.white,
+                              height: 30,
+                              child: Center(child: CustomText('${listKeys[index].toString().toUpperCase()}', color: Colors.indigo[300], fontStyle: FontStyle.italic, fontSize: 12.0,))
+                          ),
+                        );
+                      },
+                      separatorBuilder: (BuildContext context, int index) => const Divider(),
+                    ),
+                  ),
+                  SizedBox(
+                    height: MediaQuery.of(context).size.height*0.70,
+                    child: (parsedData!=null? CustomListView(parsedData) : CustomText("en cours")),
+                  )
+                ],
+              ),
+          ),
         );
       } else {
         // grid
@@ -282,30 +288,35 @@ class _HomeState extends State<Home> {
 
 
   void dbConnect() async{
-    db = await Database();
-    Future.delayed(Duration(seconds: 1), () {
-      if (db!=null) {
-        print("...DATA RECEIVED...");
-        setState(() {
-          listKeys = db.getActualKeys();
-          listEntries = db.getActualEntries();
-        });
-        print(listKeys);
-        print(listEntries);
-      }
-    });
-
+    db = Database();
+    bool isConnected = await db.initDb();
+    if(isConnected==true) {
+      setState(() {
+        listKeys = db.getActualKeys();
+        listEntries = db.getActualEntries();
+      });
+      print("DATABASE CONNECTION : SUCCESS");
+      parsing();
+    }else{
+      print("DATABASE CONNECTION : FAILED");
+    }
   }
 
-  Future<Null> parsing() async{
-
-
-    final resp = await Parser().loadRSS("${listEntries[0]['url']}");
-    if (resp!=null) {
-      print("...DATA RECEIVED...");
-      setState(() {
-        feed = resp;
-      });
+  void parsing() async{
+    if(listKeys != null && listEntries != null) {
+      final response = await Parser().loadRSS(listKeys, listEntries);
+      if(response!=null) {
+        setState(() {
+          parsedData = response;
+          print(parsedData);
+          parsedData.forEach((e) {
+            print(e['date']);
+          });
+        });
+        print("DATA PARSING FLUX PROCESS : SUCCESS");
+      } else {
+        print("DATA PARSING FLUX PROCESS : FAILED");
+      }
     }
   }
 }
