@@ -24,29 +24,25 @@ class Database{
   @override
   String toString() => toJson().toString();
 
-  Future initDb() async{
-    await Barbarian.init();
-    if(userDefault==null) {
-      var get = Barbarian.read("user_default",
-          customDecode: (output) => output.map((k, v) => MapEntry(k, v)));
-      print("j'oouvre la db $get");
-      if(get==null) {
-        Barbarian.write("user_default", userDefaultLocked);
-        print("...CREATE DATABASE...");
-      }else{
-        userDefault = get;
-        print(userDefault);
-        print("jattribue la base trouvée à $userDefault");
-        print("...LOADING DATABASE...");
+  initDb() async{
+    await Barbarian.init().then((response) {
+      if(userDefault==null) {
+        var get = Barbarian.read("user_default",
+            customDecode: (output) => output.map((k, v) => MapEntry(k, v)));
+        print("j'oouvre la db $get");
+        if(get==null) {
+          Barbarian.write("user_default", userDefaultLocked);
+          print("...CREATE DATABASE...");
+        }else{
+          userDefault = get;
+          print(userDefault);
+          print("jattribue la base trouvée à $userDefault");
+          print("...LOADING DATABASE...");
+        }
       }
-    }
-    return Future.delayed(Duration(seconds: 4), () => userDefault);
-  }
+      return userDefault;
+    });
 
-  Future<Map> get(String name) async {
-    var get = await userDefault['manager_flux'][name];
-    print("je get $get");
-    return get;
   }
 
   getList() {
@@ -94,6 +90,9 @@ class Database{
       print(k);
       l.add(k);
     });
+//    for(var key in userDefault['manager_flux'].keys) {
+//      l.add(key);
+//    }
     print(l);
     return l;
   }
@@ -104,6 +103,9 @@ class Database{
       print(v);
       l.add(v);
     });
+//    for(var value in userDefault['manager_flux'].values) {
+//      l.add(value);
+//    }
     return l;
   }
 

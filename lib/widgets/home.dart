@@ -26,7 +26,9 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
 
-  Future feed;
+  AtomFeed feed;
+
+  List<Future<dynamic>>listOfFeeds;
 
   CardItem cardItem;
 
@@ -61,13 +63,8 @@ class _HomeState extends State<Home> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    setState(() {
-      dbConnect();
-      Future.delayed((Duration(seconds: 2)), (){
-        parsing();
-      });
-
-    });
+    dbConnect();
+    parsing();
   }
 
   @override
@@ -126,7 +123,8 @@ class _HomeState extends State<Home> {
                                   child: Column(
                                     children: <Widget>[
                                       TextField(
-                                        obscureText: true,
+
+                                        obscureText: false,
                                         decoration: InputDecoration(
                                           border: OutlineInputBorder(),
                                           labelText: "Name",
@@ -139,7 +137,7 @@ class _HomeState extends State<Home> {
                                       ),
                                       Padding(padding: EdgeInsets.all(10.0)),
                                       TextField(
-                                        obscureText: true,
+                                        obscureText: false,
                                         decoration: InputDecoration(
                                           border: OutlineInputBorder(),
                                           labelText: 'URL',
@@ -268,7 +266,10 @@ class _HomeState extends State<Home> {
                     separatorBuilder: (BuildContext context, int index) => const Divider(),
                   ),
                 ),
-                CustomListView(feed),
+//                SizedBox(
+//                  height: MediaQuery.of(context).size.height*0.59,
+//                  child: (feed!=null? CustomListView(feed) : CustomText("en cours")),
+//                )
               ],
             ),
         );
@@ -281,56 +282,30 @@ class _HomeState extends State<Home> {
 
 
   void dbConnect() async{
-    try {
-      db = await Database();
-      Future.delayed(Duration(seconds: 1), () {
-        if (db!=null) {
-          print("...DATA RECEIVED...");
-          setState(() {
-            listKeys = db.getActualKeys();
-            listEntries = db.getActualEntries();
-          });
-          print(listKeys);
-          print(listEntries);
-        }
-      });
-
-    } catch (err) {
-      print("...ERROR DURING CONNECTION...");
-    }
+    db = await Database();
+    Future.delayed(Duration(seconds: 1), () {
+      if (db!=null) {
+        print("...DATA RECEIVED...");
+        setState(() {
+          listKeys = db.getActualKeys();
+          listEntries = db.getActualEntries();
+        });
+        print(listKeys);
+        print(listEntries);
+      }
+    });
 
   }
 
-  void parsing() async{
-    //      Future.delayed((Duration(seconds: 8)), () {
-//
-//      });
-    try {
-      var response = Parser(listKeys, listEntries).loadRSS();
-      Future.delayed(Duration(seconds: 2), () {
-        if(response!=null) {
-          setState(() {
-            feed = response;
-            print(feed);
-          });
-        } else {
-          print("request didn't succeed");
-        }
+  Future<Null> parsing() async{
+
+
+    final resp = await Parser().loadRSS("${listEntries[0]['url']}");
+    if (resp!=null) {
+      print("...DATA RECEIVED...");
+      setState(() {
+        feed = resp;
       });
-
-    } catch (err) {
-      print("...ERROR DURING CONNECTION...");
     }
-
-//    if(listEntries!=null && listKeys !=null) {
-//      var response = await Parser(listKeys, listEntries).loadRSS();
-//      print("la reponse est : $response");
-//      Future.delayed((Duration(seconds: 8)), () {
-//
-//      });
-//
-//    }
-
   }
-
 }
