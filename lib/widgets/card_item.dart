@@ -18,7 +18,7 @@ class CardItem extends Card {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
                   customContainer(CustomText((author!=null ? author : "NOT FOUND"), color: (author!=null ? Colors.black : Colors.grey), fontSize: 20.0,)),
-                  customContainer(CustomText(lastBuildDate, color: Colors.red, fontSize: 12.0,)),
+                  customContainer(CustomText(lastBuildDate, color: Colors.black, fontSize: 12.0,)),
                 ],
               ),
               Row(
@@ -30,7 +30,7 @@ class CardItem extends Card {
                       child: (enclosureUrl!=""? Image.network(enclosureUrl, fit: BoxFit.fill, width: 150.0, height: 100.00,) : Image.asset("assets/img/no_image.png", width: 150.0, height: 150.00, fit: BoxFit.fill,)),
                     ),
                   ),
-                  customContainer(CustomText(title, color: Colors.white, fontSize: 16.0, fontStyle: FontStyle.italic,), size: 225.00),
+                  customContainer(CustomText(title, color: Colors.white, fontSize: 16.0, fontStyle: FontStyle.italic,), size: 200.00),
                 ],
               )
             ],

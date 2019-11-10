@@ -10,7 +10,13 @@ class Database{
         "type" : "xml",
         "date" : DateTime.now().toString()
       },
-    }
+      "appledev" : {
+      "url" : "https://developer.apple.com/news/releases/rss/releases.rss",
+      "type" : "rss",
+      "date" : DateTime.now().toString()
+      },
+    },
+
   };
 
   Map userDefault;

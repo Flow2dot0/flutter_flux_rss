@@ -1,25 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_flux_rss/models/date_convert.dart';
-import 'package:flutter_flux_rss/widgets/card_item.dart';
-import 'package:webfeed/domain/atom_feed.dart';
-import 'package:webfeed/domain/rss_feed.dart';
-import 'package:webfeed/domain/rss_item.dart';
-import 'package:flutter_flux_rss/models/date_convert.dart';
-import 'package:intl/intl.dart';
 
-class CustomListView extends StatefulWidget {
+import 'card_item.dart';
 
+class CustomGrid extends StatefulWidget {
   List<Map> feed;
 
-  CustomListView(this.feed);
+  CustomGrid(this.feed);
+
 
   @override
-  _CustomListViewState createState() => _CustomListViewState();
+  _CustomGridState createState() => _CustomGridState();
 }
 
-class _CustomListViewState extends State<CustomListView> {
-
-  var convertedDateList;
+class _CustomGridState extends State<CustomGrid> {
 
   @override
   void initState() {
@@ -31,8 +25,8 @@ class _CustomListViewState extends State<CustomListView> {
   @override
   Widget build(BuildContext context) {
     List l = widget.feed;
-    return ListView.builder(
-        itemCount: l.length,
+    return GridView.builder(
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2),
         itemBuilder: (context, i) {
           Map each = l[i];
           return Container(
@@ -41,7 +35,6 @@ class _CustomListViewState extends State<CustomListView> {
           );
         }
     );
-
   }
   convertDate(List<Map> l) async{
     var response = await DateConvert().formattingDate(l);

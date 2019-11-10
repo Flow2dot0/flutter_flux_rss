@@ -3,11 +3,6 @@ import 'package:http/http.dart' as http;
 import 'dart:async';
 
 class Parser {
-//  final url = "https://www.bfmtv.com/rss/info/flux-rss/flux-toutes-les-actualites/";
-//  final channelLists = [
-//    "https://www.bfmtv.com/rss/planete/",
-//    "https://www.bfmtv.com/rss/culture/"
-//  ];
 
   final Map channelMap = {
     'theverge' : 'https://www.theverge.com/rss/index.xml',
@@ -29,29 +24,30 @@ class Parser {
       index++;
       final getFeed = await client.get(value['url']);
       String url = value['url'].toString();
-      mode = url.substring(url.length-4, url.length);
+      mode = url.substring(url.length-3, url.length);
       if(getFeed.statusCode==200){
         print(getFeed.body);
         switch(mode) {
-          case ".xml" :
+          case "xml" :
             AtomFeed feed = AtomFeed.parse(getFeed.body);
+            print("le nv $feed");
             feed.items.forEach((item) {
               Map data = {
                 "title" : item.title,
                 "date" : item.updated,
-                "author" : null,
+                "author" : getKeys[index].toString().toUpperCase(),
                 "poster" : null,
               };
               dataFull.add(data);
             });
             break;
-          case ".rss" :
+          case "rss" :
             RssFeed feed = RssFeed.parse(getFeed.body);
             feed.items.forEach((item) {
               Map data = {
                 "title" : item.title,
                 "date" : item.pubDate,
-                "author" : null,
+                "author" : getKeys[index].toString().toUpperCase(),
                 "poster" : null,
               };
               dataFull.add(data);
@@ -60,18 +56,7 @@ class Parser {
         }
       }
     }
-
-    print(dataFull);
     return dataFull;
-  }
-
-  ordering(List<Map> dataFull, {String sortType = "date"}) async{
-    var tmp = dataFull.sort((a, b) {
-      var aType = a['$sortType'];
-      var bType = b[('$sortType')];
-      return aType.compareTo(bType);
-    });
-    return tmp;
   }
 
 }

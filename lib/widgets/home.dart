@@ -4,6 +4,7 @@ import 'package:barbarian/barbarian.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_flux_rss/models/database.dart';
 import 'package:flutter_flux_rss/models/parser.dart';
+import 'package:flutter_flux_rss/widgets/custom_grid.dart';
 import 'dart:async';
 import 'package:flutter_flux_rss/widgets/custom_list_view.dart';
 import 'package:flutter_flux_rss/widgets/custom_text.dart';
@@ -26,40 +27,25 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
 
+  final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey = GlobalKey<RefreshIndicatorState>();
+
   AtomFeed feed;
 
   List<Future<dynamic>>listOfFeeds;
 
   CardItem cardItem;
 
-  Map data = {
-    "1" : 1,
-    "2" : 2,
-  };
-
-  Map map = {
-    "1": {
-      "title" : {
-        "format" : "true"
-      }
-    }
-  };
   List<CardItem> dataList;
 
   List getListOfFeeds;
-
-
 
   var db;
   List<dynamic> listKeys;
   List<dynamic> listEntries;
   List<Map> parsedData;
 
-
   var editingName;
   var editingUrl;
-
-  var testL = ["0", "1"];
 
   final List<String> entries = <String>['A', 'B', 'C'];
   final List<int> colorCodes = <int>[600, 500, 100];
@@ -129,7 +115,6 @@ class _HomeState extends State<Home> {
                                     child: Column(
                                       children: <Widget>[
                                         TextField(
-
                                           obscureText: false,
                                           decoration: InputDecoration(
                                             border: OutlineInputBorder(),
@@ -181,7 +166,7 @@ class _HomeState extends State<Home> {
                     ],
                   ),
                   Container(
-                    height: 125.00,
+                    height: 100.00,
                     padding: EdgeInsets.all(22.0),
                     child: ListView.separated(
                       padding: const EdgeInsets.all(8),
@@ -203,7 +188,7 @@ class _HomeState extends State<Home> {
                                           child: Column(
                                             children: <Widget>[
                                               TextField(
-                                                obscureText: true,
+                                                obscureText: false,
                                                 decoration: InputDecoration(
                                                   border: OutlineInputBorder(),
                                                   labelText: "Name",
@@ -216,7 +201,7 @@ class _HomeState extends State<Home> {
                                               ),
                                               Padding(padding: EdgeInsets.all(10.0)),
                                               TextField(
-                                                obscureText: true,
+                                                obscureText: false,
                                                 decoration: InputDecoration(
                                                   border: OutlineInputBorder(),
                                                   labelText: 'URL',
@@ -273,19 +258,45 @@ class _HomeState extends State<Home> {
                   ),
                   SizedBox(
                     height: MediaQuery.of(context).size.height*0.70,
-                    child: (parsedData!=null? CustomListView(parsedData) : CustomText("en cours")),
+                    child: RefreshIndicator(
+                      key: _refreshIndicatorKey,
+                      onRefresh: _refresh,
+                      child: reloading(),
+                    ),
                   )
                 ],
               ),
           ),
         );
       } else {
-        // grid
+        return CustomGrid(parsedData);
       }
     }
   }
+  Future<Null> _refresh() async{
+    db = Database();
+    bool isConnected = await db.initDb();
+    if(isConnected==true) {
+      setState(() {
+        listKeys = db.getActualKeys();
+        listEntries = db.getActualEntries();
+      });
+      print("DATABASE CONNECTION : SUCCESS");
+      parsing();
+    }else{
+      print("DATABASE CONNECTION : FAILED");
+    }
+  }
 
+  Widget reloading() {
+    if(parsedData!=null){
+      return CustomListView(parsedData);
+    }
+    else {
+      return CustomText("en cours");
 
+    }
+  }
 
   void dbConnect() async{
     db = Database();
@@ -308,7 +319,6 @@ class _HomeState extends State<Home> {
       if(response!=null) {
         setState(() {
           parsedData = response;
-          print(parsedData);
           parsedData.forEach((e) {
             print(e['date']);
           });
