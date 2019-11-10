@@ -1,24 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_flux_rss/models/date_convert.dart';
-import 'package:flutter_flux_rss/widgets/card_item.dart';
+import 'package:flutter_flux_rss/widgets/grid_item.dart';
 import 'package:webfeed/domain/rss_feed.dart';
-import 'package:webfeed/domain/rss_item.dart';
-import 'package:flutter_flux_rss/models/date_convert.dart';
-import 'package:intl/intl.dart';
 
-class CustomListView extends StatefulWidget {
-
+class CustomGridView extends StatefulWidget {
   RssFeed feed;
 
-  CustomListView(RssFeed feed) {
+  CustomGridView(RssFeed feed) {
     this.feed = feed;
   }
 
   @override
-  _CustomListViewState createState() => _CustomListViewState();
+  _CustomGridViewState createState() => _CustomGridViewState();
 }
 
-class _CustomListViewState extends State<CustomListView> {
+class _CustomGridViewState extends State<CustomGridView> {
 
   List<Map> feedOrderedByDate = [];
 
@@ -29,18 +24,21 @@ class _CustomListViewState extends State<CustomListView> {
     setData();
     orderingProcess();
   }
+
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-      itemCount: feedOrderedByDate.length,
+    return GridView.builder(
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 3),
+        itemCount: feedOrderedByDate.length,
         itemBuilder: (context, i) {
-        Map each = feedOrderedByDate[i];
+          Map each = feedOrderedByDate[i];
           return Container(
-            child: CardItem(each['item.author'], DateConvert().convertDate(each['item.pubDate']), each['item.enclosure.url'], each['item.title']),
+            child: GridItem(each),
           );
         }
     );
   }
+
 
   orderingProcess() {
     feedOrderedByDate.sort((a,b) {
@@ -50,11 +48,19 @@ class _CustomListViewState extends State<CustomListView> {
     });
   }
 
+  fixAuthor(x) {
+    if(x!=null) {
+      return x;
+    } else {
+      return "Unknown";
+    }
+  }
+
   void setData() {
 
     widget.feed.items.forEach((item) {
       var data = {
-        'item.author' : item.author,
+        'item.author' : fixAuthor(item.author),
         'item.pubDate' : item.pubDate,
         'item.enclosure.url' : item.enclosure.url,
         'item.title' : item.title,

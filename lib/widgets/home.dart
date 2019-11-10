@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:flutter_flux_rss/models/parser.dart';
+import 'package:flutter_flux_rss/widgets/custom_grid_view.dart';
 import 'package:flutter_flux_rss/widgets/custom_list_view.dart';
 import 'package:webfeed/webfeed.dart';
 import 'card_item.dart';
@@ -58,6 +59,7 @@ class _HomeState extends State<Home> {
         return CustomListView(feed);
       } else {
         // grid
+        return CustomGridView(feed);
       }
     }
   }
