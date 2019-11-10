@@ -29,7 +29,7 @@ class CardItem extends Card {
                       child: (enclosureUrl!=""? Image.network(enclosureUrl, fit: BoxFit.fill,) : Image.asset("assets/img/no_image.png", width: 150.0, height: 120.00, fit: BoxFit.fill,)),
                     ),
                   ),
-                  customContainer(CustomText(title, color: Colors.black, fontSize: 16.0, fontStyle: FontStyle.italic,), size: 225.00),
+                  customContainer(CustomText(title, color: Colors.black, fontSize: 14.0, fontStyle: FontStyle.italic,), size: 200.00),
                 ],
               )
             ],

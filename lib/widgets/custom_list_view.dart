@@ -29,14 +29,13 @@ class _CustomListViewState extends State<CustomListView> {
     super.initState();
     setData();
     orderingProcess();
-    print(feedOrderedByDate[28]);
   }
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
-      itemCount: fixFeedOrderedByDate.length,
+      itemCount: feedOrderedByDate.length,
         itemBuilder: (context, i) {
-        Map each = fixFeedOrderedByDate[i];
+        Map each = feedOrderedByDate[i];
           return Container(
             child: CardItem(each['item.author'], DateConvert().convertDate(each['item.pubDate']), each['item.enclosure.url'], each['item.title']),
           );
@@ -48,14 +47,8 @@ class _CustomListViewState extends State<CustomListView> {
     feedOrderedByDate.sort((a,b) {
       var aDate = a['item.pubDate'];
       var bDate = b['item.pubDate'];
-      return aDate.compareTo(bDate);
+      return bDate.compareTo(aDate);
     });
-    fixFeedOrderedByDate.add(feedOrderedByDate[feedOrderedByDate.length-1]);
-    for(int i = 0; i < feedOrderedByDate.length; i++) {
-      if(i < feedOrderedByDate.length-1) {
-        fixFeedOrderedByDate.add(feedOrderedByDate[i]);
-      }
-    }
   }
 
   void setData() {
