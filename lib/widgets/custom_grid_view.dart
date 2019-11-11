@@ -64,6 +64,7 @@ class _CustomGridViewState extends State<CustomGridView> {
         'item.pubDate' : item.pubDate,
         'item.enclosure.url' : item.enclosure.url,
         'item.title' : item.title,
+        'item.description' : item.description
       };
       feedOrderedByDate.add(data);
     });

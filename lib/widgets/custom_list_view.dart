@@ -1,10 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_flux_rss/models/date_convert.dart';
-import 'package:flutter_flux_rss/widgets/card_item.dart';
+import 'package:flutter_flux_rss/widgets/list_item.dart';
 import 'package:webfeed/domain/rss_feed.dart';
-import 'package:webfeed/domain/rss_item.dart';
-import 'package:flutter_flux_rss/models/date_convert.dart';
-import 'package:intl/intl.dart';
 
 class CustomListView extends StatefulWidget {
 
@@ -36,7 +32,7 @@ class _CustomListViewState extends State<CustomListView> {
         itemBuilder: (context, i) {
         Map each = feedOrderedByDate[i];
           return Container(
-            child: CardItem(each['item.author'], DateConvert().convertDate(each['item.pubDate']), each['item.enclosure.url'], each['item.title']),
+            child: ListItem(each),
           );
         }
     );
@@ -50,14 +46,23 @@ class _CustomListViewState extends State<CustomListView> {
     });
   }
 
+  fixAuthor(x) {
+    if(x!=null) {
+      return x;
+    } else {
+      return "Unknown";
+    }
+  }
+
   void setData() {
 
     widget.feed.items.forEach((item) {
       var data = {
-        'item.author' : item.author,
+        'item.author' : fixAuthor(item.author),
         'item.pubDate' : item.pubDate,
         'item.enclosure.url' : item.enclosure.url,
         'item.title' : item.title,
+        'item.description' : item.description
       };
       feedOrderedByDate.add(data);
     });

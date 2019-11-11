@@ -6,7 +6,6 @@ import 'package:flutter_flux_rss/models/parser.dart';
 import 'package:flutter_flux_rss/widgets/custom_grid_view.dart';
 import 'package:flutter_flux_rss/widgets/custom_list_view.dart';
 import 'package:webfeed/webfeed.dart';
-import 'card_item.dart';
 import 'loading_screen.dart';
 
 class Home extends StatefulWidget {
@@ -23,10 +22,6 @@ class _HomeState extends State<Home> {
   RssFeed feed;
   RssItem item;
 
-  CardItem cardItem;
-
-  Map data;
-  List<CardItem> dataList;
 
   @override
   void initState() {
